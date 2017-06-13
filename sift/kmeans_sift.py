@@ -10,26 +10,27 @@ import sklearn.cluster as sklcluster
 from sklearn.externals import joblib
 
 if __name__ == '__main__': 
+	type = 'sifts'
 	mode = 'random'
 	inmode = 'mix'
 	
-	for f in [25]: 
+	for f in [10]: 
 		# mode = 'train'
 		# fact = 25
 		'''bug bug bug'''
 		
-		X = np.loadtxt('../data/trajs_%s_%s_f%d.txt'%(mode, inmode, f)) # [:10000,:]
-		print('../data/trajs_%s_%s_f%d.txt'%(mode, inmode, f), X.shape)
+		X = np.loadtxt('../data/%s_%s_%s_f%d.txt'%(type, mode, inmode, f)) # [:10000,:]
+		print('../data/%s_%s_%s_f%d.txt'%(type, mode, inmode, f), X.shape)
 		
-		for k in [8192]:
+		for k in [128,256,512,1024]:
 		# for k in [4096,8192]:
 			'''bug bug bug'''
 			# k = 2048
 			kms = sklcluster.KMeans(n_clusters=k, n_init=8, random_state=None, n_jobs=-1-8-8-4-2)
 			kms.fit(X)
-			print('../data/kmeans_%s_f%d_k%d.model'%(inmode, f, k))
-			joblib.dump(kms, '../data/kmeans_%s_f%d_k%d.model'%(inmode, f, k))
-			# kms = joblib.load('../data/kmeans_%s_f%d_k%d.model'%(inmode, f, k))
+			print('../data/%s_kmeans_%s_f%d_k%d.model'%(type, inmode, f, k))
+			joblib.dump(kms, '../data/%s_kmeans_%s_f%d_k%d.model'%(type, inmode, f, k))
+			# kms = joblib.load('../data/%s_kmeans_%s_f%d_k%d.model'%(type, inmode, f, k))
 
 			'''
 			def build_hist(mode): 
