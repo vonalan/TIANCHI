@@ -25,10 +25,11 @@ def build_hist(mode, inmode, f, k):
     # videos = ['train_7880_0.00_h4.avi', 'train_7478_20.00_h4.avi']
     # [info, traj, hof, hog, mbhx, mbhy] = [10, 20, 64, 72, 64, 64]
 
-    H = np.zeros((0,k),dtype=int)
+    HIST = np.zeros((0,k),dtype=int)
 
     for i in range(len(videos)): 
         if i%num_tasks == pid:
+            H = np.zeros((15,k))
             for j in range(15): 
                 # dir_bin = './DenseTrackStab'
                 # dir_vid = '../vid/%s'%videos[i]
@@ -46,23 +47,20 @@ def build_hist(mode, inmode, f, k):
                     rf2.close()
                 else:
                     print('%s is not existed! '%dir_idt)
-            
-        h = np.zeros((1,k), dtype=int)
+                
+                h = np.zeros((1,k), dtype=int)
+                if len(sifts): 
+                    siftsA = np.array(sifts)
+                    # print siftsA 
+                    x = kms.predict(siftsA)
+                    # print x
+                    h = (np.histogram(x, bins=k, range=(0,k))[0]).astype(int)
+                H[j,:] = h
+            HIST = np.vstack((HIST, H.reshape((1,15*k))))
+                
+        break
 
-        if len(sifts): 
-            siftsA = np.array(sifts)
-            # print siftsA 
-            x = kms.predict(siftsA)
-            # print x
-            h = (np.histogram(x, bins=k, range=(0,k))[0]).astype(int)
-        
-        print(i+1, h)
-        H = np.vstack((H,h))
-
-        # break
-
-    np.savetxt('../data/hist_%s_%s_f%d_k%d.txt'%(mode, inmode, f, k), H)
-
+    np.savetxt('../data/hist_%s_%s_f%d_k%d.txt'%(mode, inmode, f, k), HIST)
 
 
 type = 'sifts'
@@ -77,7 +75,7 @@ for f in [10]:
     # X = np.loadtxt('../data/%s_%s_%s_f%d.txt'%(type, mode, inmode, f)) # [:10000,:]
     # print('../data/%s_%s_%s_f%d.txt'%(type, mode, inmode, f), X.shape)
 
-    for k in [128,256,512,1024]:
+    for k in [256]:
         # for k in [4096,8192]:
         # '''bug bug bug'''
         # k = 2048
